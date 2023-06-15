@@ -7,6 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 // Classe validadora do login
 @Injectable()
 export class AuthService {
+    // Necessaria injeção de dependencia do userService e jwtService para autenticação e validação
     constructor(private readonly userService: UsersService,
                 private readonly jwtService: JwtService) {}
 

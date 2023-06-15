@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { PostsService } from "./posts.service";
 import { Posts } from "./posts.entity";
-
+import { RolesAuthGuard } from "src/auth/auth.service";
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('Posts')
 export class PostsController {
@@ -37,6 +38,7 @@ export class PostsController {
         }
     }
 
+    @UseGuards(AuthGuard('jwt'), new RolesAuthGuard('autor'))
     @Post()
     async createPost(@Body() post: Posts) {
         try {
@@ -64,6 +66,7 @@ export class PostsController {
         }
     }
 
+    @UseGuards(AuthGuard('jwt'), new RolesAuthGuard('autor'))
     @Put(':id')
     async updatePost(
         @Param('id') id: number,
@@ -81,6 +84,7 @@ export class PostsController {
         }
     }
 
+    @UseGuards(AuthGuard('jwt'), new RolesAuthGuard('autor'))
     @Delete(':id')
     async deletePost(
         @Param('id') id: number

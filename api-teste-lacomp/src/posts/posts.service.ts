@@ -25,7 +25,7 @@ export class PostsService {
     async getById(id: number): Promise<Posts> {
         const post: Posts = await this.postRepository.findOneBy({id: id});
 
-        if (post === null) {
+        if (!post) {
             throw new HttpException('Não foi encontrado post para esse ID!', HttpStatus.NOT_FOUND);
         }
 
@@ -44,7 +44,6 @@ export class PostsService {
         const createdPost: Posts = await this.postRepository.create(post);
         const posted = await this.postRepository.save(createdPost);
 
-        delete posted.user.email;
         delete posted.user.password;
         delete posted.user.createdAt;
         delete posted.user.updatedAt;

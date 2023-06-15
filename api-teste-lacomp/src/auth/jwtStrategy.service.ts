@@ -5,6 +5,7 @@ import { AuthService } from "./auth.service";
 import { User } from "src/users/user.entity";
 import { JwtPayload } from 'jsonwebtoken';
 
+// Implementação do Jwt
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly authService: AuthService) {

@@ -7,9 +7,10 @@ import { User } from "src/users/user.entity";
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
+    // Login realizado com um partial do User
     @Post()
     async login(
-        @Body() user: User
+        @Body() user: Partial<User>
     ) {
         return this.authService.login(user);
     }

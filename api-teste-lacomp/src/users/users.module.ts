@@ -5,6 +5,7 @@ import { UsersService } from './user.service';
 import { UsersController } from './user.controller';
 import { Posts } from 'src/posts/posts.entity';
 
+// Users Module exportado
 @Module({
     imports: [TypeOrmModule.forFeature([User, Posts])],
     providers: [UsersService],

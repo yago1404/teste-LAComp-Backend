@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { UsersService } from "./user.service";
 import { User } from "./user.entity";
-
+import { RolesAuthGuard } from "src/auth/auth.service";
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('Users')
 export class UsersController {
@@ -64,6 +65,36 @@ export class UsersController {
         }
     }
 
+    @UseGuards(AuthGuard('jwt'), new RolesAuthGuard('admin'))
+    @Post('/admin')
+    async createAdminUser(
+        @Body() user: User
+    ) {
+        try {
+            const camposObrigatorios = ['email', 'name', 'role', 'password'];
+            const camposEmFalta = [];
+
+            camposObrigatorios.forEach((campo) => {
+                if (!user[campo]) {
+                    camposEmFalta.push(campo);
+                }
+            });
+
+            if (camposEmFalta.length > 0) {
+                throw new HttpException(`Os campos ${camposEmFalta} são obrigatórios!`, HttpStatus.BAD_REQUEST);
+            }
+
+            return this.userService.createAdminUser(user);
+        } catch (err) {
+            throw new HttpException({
+                statusCode: err.getStatus(),
+                err: err.message,
+            }, err.getStatus(), {
+                cause: err,
+            });
+        }
+    }
+
     @Patch(':id')
     async updateUser(
         @Param('id') id: number,
@@ -73,14 +104,15 @@ export class UsersController {
             return await this.userService.updateUser(id, user);
         } catch(err) {
             throw new HttpException({
-                statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                err: 'Não foi possível atualizar o usuário',
-            }, HttpStatus.INTERNAL_SERVER_ERROR, {
+                statusCode: err.getStatus(),
+                err: err.message,
+            }, err.getStatus(), {
                 cause: err,
             });
         }
     }
 
+    @UseGuards(AuthGuard('jwt'), new RolesAuthGuard('admin'))
     @Delete(':id')
     async deleteUser(
         @Param('id') id: number
@@ -89,9 +121,9 @@ export class UsersController {
             return await this.userService.deleteUser(id);
         } catch(err) {
             throw new HttpException({
-                statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                err: 'Não foi possível deletar o usuário.',
-            }, HttpStatus.INTERNAL_SERVER_ERROR, {
+                statusCode: err.getStatus(),
+                err: err.message,
+            }, err.getStatus(), {
                 cause: err,
             })
         }
